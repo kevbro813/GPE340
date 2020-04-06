@@ -7,7 +7,7 @@ public class CameraManager : MonoBehaviour
 {
     public GameObject followObject; // GameObject the camera will follow
     private Transform tf; // Transform component for the camera
-    private Transform fotf; // Follow object Transform component
+    public Transform fotf; // Follow object Transform component
     private float currentX = 0.0f; // Current X value of the mouse
     private float currentY = 0.0f; // Current Y value of the mouse
     private const float Y_ANGLE_MIN = 5.0f; // Constant lower boundary to clamp the camera angle (prevents camera from moving under the ground)
@@ -17,14 +17,13 @@ public class CameraManager : MonoBehaviour
     private void Start()
     {
         tf = GetComponent<Transform>(); // Get the transform component for the camera
-        fotf = followObject.GetComponent<Transform>(); // Get the Transform component for the followObject
     }
     // Update is called once per frame
     void Update()
     {
         if (followObject == null) // Check if the follow object is null
         {
-            Debug.Log("Null Reference Exception: followObject not set to an instance."); 
+            return;
         }
         else // If the follow object is not null
         {
