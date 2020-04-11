@@ -54,8 +54,15 @@ public class GameManager : MonoBehaviour
     public int currentEnemies = 0; // Tracks current number of enemies
     public float enemyRespawnDelay = 3.0f; // Duration to wait before spawning/respawning enemies
 
+    [Header("Empty Shell Objects")]
+    public Transform pickupShell;
+    public Transform playerShell;
+    public Transform enemyShell;
+    public Transform weaponShell;
+
     [Header("Other Settings")]
     public GameState gameState; // Tracks the current game state using an enum
+
     public enum GameState { Pregame, Active, Postgame, Pause, Resume } // Enum for game state
 
     private void Awake()
@@ -155,19 +162,10 @@ public class GameManager : MonoBehaviour
     public void InstantiatePlayer()
     {
         // Instantiate player pawn
-        GameObject playerClone = Instantiate(playerPrototype, playerSpawn.position, playerSpawn.rotation) as GameObject;
+        GameObject playerClone = Instantiate(playerPrototype, playerSpawn.position, playerSpawn.rotation, playerShell) as GameObject;
 
         // Add player to list of active players (will be helpful if I add multiplayer)
         activePlayers.Add(playerClone);
-
-        PlayerData pd = playerClone.GetComponent<PlayerPawn>().pData; // Get the PlayerData class from the PlayerPawn component
-
-        pd.SetCurrentHealth(pd.GetInitialHealth()); // Reset health to initial health
-        pd.SetCritChance(pd.GetInitialCritChance()); // Reset critChance to initialCritChance
-        pd.SetCritDamage(pd.GetInitialCritDamage()); // Reset critDamage to initialCritDamage
-
-        // Initialize playerHUD display values with the current critChance, critDamage and HealthPercentage
-        playerHUD.UpdateHUD(pd.GetCritChance(), pd.GetCritDamage(), pd.GetCurrentHealthPercentage()); // This updates all three HUD elements together
 
         // Set camera's follow object and the follow object's transform component
         SetCamera(playerClone);
@@ -211,7 +209,7 @@ public class GameManager : MonoBehaviour
             GameObject randomPickup = pickupPrototypes[Random.Range(0, pickupPrototypes.Count)];
 
             // Instantiate pickup at the pickupSpawnpoint
-            GameObject pickupClone = Instantiate(randomPickup, pickupSpawnpoint.position, pickupSpawnpoint.rotation) as GameObject;
+            GameObject pickupClone = Instantiate(randomPickup, pickupSpawnpoint.position, pickupSpawnpoint.rotation, pickupShell) as GameObject;
 
             pickupPrototypes.Remove(randomPickup); // Remove pickup from list (prevents duplicates)
             pickupSpawnLocations.Remove(pickupSpawnpoint); // Remove pickup spawn from list (prevents multiple pickups spawning in same location)
@@ -232,7 +230,7 @@ public class GameManager : MonoBehaviour
             GameObject randomWeapon = weaponPrototypes[Random.Range(0, weaponPrototypes.Count)];
 
             // Instantiate weapon at the weaponSpawnpoint
-            GameObject weaponClone = Instantiate(randomWeapon, weaponSpawnpoint.position, weaponSpawnpoint.rotation) as GameObject;
+            GameObject weaponClone = Instantiate(randomWeapon, weaponSpawnpoint.position, weaponSpawnpoint.rotation, weaponShell) as GameObject;
 
             weaponPrototypes.Remove(randomWeapon); // Remove weapon from list (prevents duplicates)
             weaponSpawnLocations.Remove(weaponSpawnpoint); // Remove weapon spawn from list (prevents multiple weapons spawning in same location)
@@ -253,11 +251,9 @@ public class GameManager : MonoBehaviour
             GameObject randomEnemy = enemyPrototypes[Random.Range(0, enemyPrototypes.Count)];
 
             // Instantiate enemy at the enemySpawnpoint
-            GameObject enemyClone = Instantiate(randomEnemy, enemySpawnpoint.position, enemySpawnpoint.rotation) as GameObject;
+            GameObject enemyClone = Instantiate(randomEnemy, enemySpawnpoint.position, enemySpawnpoint.rotation, enemyShell) as GameObject;
 
-            weaponPrototypes.Remove(randomEnemy); // Remove enemy from list (prevents duplicates)
-            weaponSpawnLocations.Remove(enemySpawnpoint); // Remove enemy spawn from list (prevents multiple enemies spawning in same location)
-            availableWeapons.Add(enemyClone); // Add to list of available enemies
+            activeEnemies.Add(enemyClone); // Add to list of available enemies
         } 
     }
 }

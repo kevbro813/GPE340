@@ -10,12 +10,8 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: f985453c9f75efd4596c4f2e71fd58d0, type: 3}
-  m_Name: PlayerOneData
+  m_Name: Base_Player
   m_EditorClassIdentifier: 
-  currentHealth: 200
-  initialHealth: 200
-  maxHealth: 200
-  critChance: 0.1
-  critDamage: 1.5
-  initialCritChance: 0.1
-  initialCritDamage: 1.5
+  defaultMaxHealth: 200
+  defaultCritChance: 0.1
+  defaultCritDamage: 1.5

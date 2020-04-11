@@ -182,7 +182,7 @@ GameObject:
   - component: {fileID: 7798124891261500290}
   - component: {fileID: 1326802633327318226}
   - component: {fileID: 6197811139702110505}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Makarov Silenced
   m_TagString: Weapon
   m_Icon: {fileID: 0}
@@ -196,8 +196,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6211702080194460612}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.0000000026817588, y: -0, z: -1.1214089e-11, w: 1}
+  m_LocalPosition: {x: -11.672886, y: 1.3022666, z: -7.370439}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 6214736862537584640}
@@ -270,12 +270,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 20
+  attackAngle: 5
+  effectiveRange: 10
+  player: {fileID: 0}
   rightHandPosition: {fileID: 2801393043002501427}
   leftHandPosition: {fileID: 3412536891050090903}
   rightElbowPosition: {fileID: 5241788273829923267}
   leftElbowPosition: {fileID: 4549387281644889368}
-  isPlayerWeapon: 0
-  player: {fileID: 0}
   recoil: 1
   projectile: {fileID: 8409787560697745865, guid: c3f76912016af3542993a9b1779071dc,
     type: 3}

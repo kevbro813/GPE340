@@ -20,7 +20,7 @@ public class PlayerController : Base_Controller
     }
 
     // Update is called once per frame
-    void Update()
+    private void Update()
     {
         if (!playerPawn) // Check if the playerPawn is null
         {
@@ -28,6 +28,7 @@ public class PlayerController : Base_Controller
         }
         else // If the playerPawn is not null...
         {
+            //playerPawn.Ragdoll();
             inputVertical = Input.GetAxis("Vertical"); // Set the inputVertical to the Vertical axis value
             inputHorizontal = Input.GetAxis("Horizontal"); // Set the inputHorizontal to the Horizontal axis value
 

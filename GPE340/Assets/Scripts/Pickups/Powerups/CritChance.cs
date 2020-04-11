@@ -10,7 +10,7 @@ public class CritChance : Base_Powerup // CritChance is a child of Base_Powerup
     // Override the ActivatePowerup method (PlayerPawn overload)
     public override void ActivatePowerup(GameObject obj, PlayerPawn player)
     {
-        player.pData.SetCritChance(player.pData.GetCritChance() + critChanceAmount); // Set the CritChance to the upgraded amount
+        player.SetCritChance(player.GetCritChance() + critChanceAmount); // Set the CritChance to the upgraded amount
     }
 
     // Override the ActivatePowerup method (AIPawn overload)

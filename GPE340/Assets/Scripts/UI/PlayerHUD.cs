@@ -19,7 +19,7 @@ public class PlayerHUD : MonoBehaviour
     public void UpdateHUD(float critChance, float critDamage, float healthPercentage) // Pass in values to update the HUD with
     {
         UpdateCritDamage(critDamage); // Update critDamage value
-        UpdateCritChance(healthPercentage); // Update critChance value
+        UpdateCritChance(critChance); // Update critChance value
         UpdateHealth(healthPercentage); // Update Health bar based on health percentage
     }
     // Update only health bar

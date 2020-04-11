@@ -20,12 +20,51 @@ public abstract class Base_Pawn : MonoBehaviour
     public Transform rightElbowIK; // Right elbow IK Hint position
     public Transform leftElbowIK; // Left elbow IK Hint Position
 
+    [Header("Health Settings")]
+    [SerializeField] private float currentHealth; // Variable to contain the object's current health
+    [SerializeField] private float maxHealth; // Maximum health that the object can have
+    public bool isRagdoll = false;
+
+    /// <summary>
+    /// Getter method for currentHealth
+    /// </summary>
+    public float GetCurrentHealth()
+    {
+        return currentHealth;
+    }
+    /// <summary>
+    /// Sets currentHealth to a float value.
+    /// </summary>
+    public void SetCurrentHealth(float ch)
+    {
+        currentHealth = ch;
+    }
+    /// <summary>
+    /// Getter method for maxHealth
+    /// </summary>
+    public float GetMaxHealth()
+    {
+        return maxHealth;
+    }
+    /// <summary>
+    /// Setter method for maxHealth
+    /// </summary>
+    public void SetMaxHealth(float mh)
+    {
+        maxHealth = mh;
+    }
+    /// <summary>
+    /// Method used to calculate the health percentage (used for health bar)
+    /// </summary>
+    public float GetCurrentHealthPercentage()
+    {
+        return currentHealth / maxHealth;
+    }
     public virtual void Awake() // Virtual Awake method, will be overridden by children
     {
         tf = GetComponent<Transform>(); // Set the transform component
         anim = GetComponent<Animator>(); // Set the animator component
     }
-
     // Virtual method for EquipWeapon
     public virtual void EquipWeapon(GameObject weap) // Pass in the weapon gameobject that will be used
     {
@@ -93,6 +132,7 @@ public abstract class Base_Pawn : MonoBehaviour
             // The following code will toss the weapon ahead of the parent object to prevent it from immediately being picked up again
             equippedWeapon.GetComponent<Transform>().Translate(Vector3.forward, Space.Self);
             equippedWeapon.layer = 0; // Reset the weapon's layer to default
+            equippedWeapon.GetComponent<Weapon>().SetIsPlayerWeapon(false); // Also set isPlayerWeapon to false so it is no longer identified as the player's weapon
             equippedWeapon = null; // Make equippedWeapon null, prevents gun from being fired by player after it is unequipped
         }
     }
@@ -163,6 +203,44 @@ public abstract class Base_Pawn : MonoBehaviour
         {
             // TODO: No weapon equipped/Possibly add melee weapons
         }
+    }
+
+    public void EnableRagdoll()
+    {
+        Rigidbody[] childRBs = GetComponentsInChildren<Rigidbody>();
+        foreach (Rigidbody rb in childRBs)
+        {
+            rb.isKinematic = false;
+        }
+
+        Collider[] childCols = GetComponentsInChildren<Collider>();
+        foreach (Collider col in childCols)
+        {
+            col.enabled = true;
+        }
+
+        GetComponent<CapsuleCollider>().enabled = false;
+        GetComponent<Rigidbody>().isKinematic = true;
+        anim.enabled = false;
+    }
+
+    public void DisableRagdoll()
+    {
+        Rigidbody[] childRBs = GetComponentsInChildren<Rigidbody>();
+        foreach (Rigidbody rb in childRBs)
+        {
+            rb.isKinematic = true;
+        }
+
+        Collider[] childCols = GetComponentsInChildren<Collider>();
+        foreach (Collider col in childCols)
+        {
+            col.enabled = false;
+        }
+
+        GetComponent<CapsuleCollider>().enabled = true;
+        GetComponent<Rigidbody>().isKinematic = false;
+        anim.enabled = true;
     }
 
 }

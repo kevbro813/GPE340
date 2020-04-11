@@ -42,24 +42,24 @@ public class ProjectileWeapon : Weapon
     // Calculate the damage done (either base damage if not player or base/crit damage if the player fired the weapon) 
     public float CalculateDamage()
     {
-        if (isPlayerWeapon) // Check if the player fired the weapon
+        if (GetIsPlayerWeapon()) // Check if the player fired the weapon
         { 
-            float critChance = player.pData.GetCritChance(); // Get Crit Chance value
+            float critChance = player.GetCritChance(); // Get Crit Chance value
             float rand = Random.Range(1.0f, 100.0f) / 100; // Random value between 0.01 and 1
 
             if (critChance >= rand) // Deal crit damage if crit is successful
             {
-                float critDamagePercentage = player.pData.GetCritDamage(); // Get CritDamage value
-                float critDamageAmount = damage * critDamagePercentage; // Set the damage amount to the base damage * critDamagePercentage
+                float critDamagePercentage = player.GetCritDamage(); // Get CritDamage value
+                float critDamageAmount = GetDamage() * critDamagePercentage; // Set the damage amount to the base damage * critDamagePercentage
                 Debug.Log("Crit Damage"); // TODO: This will temporarily indicate a crit hit in the console (Add indicator to canvas screen)
                 return critDamageAmount; // Return crit damage
             }
             else
             {
                 Debug.Log("Normal Damage"); // TODO: This will temporarily indicate a normal hit in the console (Add indicator to canvas screen)
-                return damage; // Return base damage if crit fails
+                return GetDamage(); // Return base damage if crit fails
             }
         }
-        return damage; // Return base damage if not the player
+        return GetDamage(); // Return base damage if not the player
     }
 }

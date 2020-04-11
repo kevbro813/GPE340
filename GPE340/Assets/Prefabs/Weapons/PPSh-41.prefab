@@ -134,7 +134,7 @@ GameObject:
   - component: {fileID: 8418347152628976207}
   - component: {fileID: 2941185642901847498}
   - component: {fileID: 7680045835721211926}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: PPSh-41
   m_TagString: Weapon
   m_Icon: {fileID: 0}
@@ -148,8 +148,8 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 7359244501858305367}
-  m_LocalRotation: {x: 0.0000018099951, y: -0.00000004371139, z: 7.9178634e-14, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.0000000026817588, y: -0, z: -1.1214089e-11, w: 1}
+  m_LocalPosition: {x: -11.672886, y: 1.3022666, z: -7.370439}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_Children:
   - {fileID: 7361844041601704417}
@@ -222,12 +222,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 50
+  attackAngle: 10
+  effectiveRange: 5
+  player: {fileID: 0}
   rightHandPosition: {fileID: 2824177933073840671}
   leftHandPosition: {fileID: 7917974152461537565}
   rightElbowPosition: {fileID: 7278267374545142910}
   leftElbowPosition: {fileID: 1607489030819750786}
-  isPlayerWeapon: 0
-  player: {fileID: 0}
   recoil: 3
   projectile: {fileID: 8409787560697745865, guid: c3f76912016af3542993a9b1779071dc,
     type: 3}

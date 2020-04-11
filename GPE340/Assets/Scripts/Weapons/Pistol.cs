@@ -23,6 +23,7 @@ public class Pistol : ProjectileWeapon
     public override void UseWeapon()
     {
         base.UseWeapon(); // Base weapon method determines if weapon is loaded
+
         // If the weapon is ready to fire...
         if (roundChambered == true)
         {

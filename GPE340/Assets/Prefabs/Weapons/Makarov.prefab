@@ -191,12 +191,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 20
+  attackAngle: 5
+  effectiveRange: 10
+  player: {fileID: 0}
   rightHandPosition: {fileID: 8768186007252419550}
   leftHandPosition: {fileID: 2911476797908587511}
   rightElbowPosition: {fileID: 9097872955083650362}
   leftElbowPosition: {fileID: 3847235554971095712}
-  isPlayerWeapon: 0
-  player: {fileID: 0}
   recoil: 1
   projectile: {fileID: 8409787560697745865, guid: c3f76912016af3542993a9b1779071dc,
     type: 3}

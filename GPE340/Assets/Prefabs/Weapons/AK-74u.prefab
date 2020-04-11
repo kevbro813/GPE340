@@ -356,7 +356,7 @@ GameObject:
   - component: {fileID: 3765457949056610137}
   - component: {fileID: 5544971876425632650}
   - component: {fileID: 2901048142209863831}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: AK-74u
   m_TagString: Weapon
   m_Icon: {fileID: 0}
@@ -370,7 +370,7 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5872393403213806521}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0.0000000026817588, y: -0, z: -1.1214089e-11, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.8, y: 0.8, z: 0.8}
   m_Children:
@@ -445,12 +445,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 50
+  attackAngle: 5
+  effectiveRange: 10
+  player: {fileID: 0}
   rightHandPosition: {fileID: 1823500881172961734}
   leftHandPosition: {fileID: 6360878808648615169}
   rightElbowPosition: {fileID: 581438730971057519}
   leftElbowPosition: {fileID: 8565688268714273840}
-  isPlayerWeapon: 0
-  player: {fileID: 0}
   recoil: 2
   projectile: {fileID: 8409787560697745865, guid: c3f76912016af3542993a9b1779071dc,
     type: 3}

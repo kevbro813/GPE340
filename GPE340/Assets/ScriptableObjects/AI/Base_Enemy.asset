@@ -10,8 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2922875497b6cce49a8cfde02ecb7b8b, type: 3}
-  m_Name: TestEnemy
+  m_Name: Base_Enemy
   m_EditorClassIdentifier: 
-  currentHealth: 700
-  initialHealth: 1000
-  maxHealth: 1000
+  defaultMaxHealth: 1000
+  fieldOfView: 45
+  maxViewDistance: 10
+  hearingRadius: 5
+  waitDuration: 0
+  waypointRange: 1
+  searchDuration: 3
+  investigateDuration: 3
+  alertDuration: 3
+  avoidanceDistance: 2
+  rotationHigh: 3
+  rotationLow: 1
+  randomRotation: 0
+  lastSoundLocation: {x: 0, y: 0, z: 0}
+  canHear: 0
+  lastPlayerLocation: {x: 0, y: 0, z: 0}
