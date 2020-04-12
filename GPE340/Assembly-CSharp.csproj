@@ -66,6 +66,8 @@
     <Compile Include="Assets\External\Standard Assets\Characters\ThirdPersonCharacter\Scripts\AICharacterControl.cs" />
     <Compile Include="Assets\External\Standard Assets\Characters\ThirdPersonCharacter\Scripts\ThirdPersonCharacter.cs" />
     <Compile Include="Assets\External\Standard Assets\Characters\ThirdPersonCharacter\Scripts\ThirdPersonUserControl.cs" />
+    <Compile Include="Assets\Scripts\ComponentSystems\AIHearing.cs" />
+    <Compile Include="Assets\Scripts\ComponentSystems\AIVision.cs" />
     <Compile Include="Assets\Scripts\ComponentSystems\HealthSystem.cs" />
     <Compile Include="Assets\Scripts\Level\Spawn.cs" />
     <Compile Include="Assets\Scripts\Managers\CameraManager.cs" />

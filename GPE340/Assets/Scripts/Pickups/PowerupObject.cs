@@ -47,13 +47,13 @@ public class PowerupObject : MonoBehaviour
         if (col.CompareTag("Player")) // If the player picks up the object
         {
             powerup.ActivatePowerup(col.gameObject, col.gameObject.GetComponent<PlayerPawn>()); // Activate powerup using the PlayerPawn overload method
+            DeactivatePickup(); // Deactivate the pickup once it is picked up
         }
         else if (col.CompareTag("AI")) // If the AI picks up the object
         {
             powerup.ActivatePowerup(col.gameObject, col.gameObject.GetComponent<AIPawn>()); // Activate powerup using the AIPawn overload method
+            DeactivatePickup(); // Deactivate the pickup once it is picked up
         }
-
-        DeactivatePickup(); // Deactivate the pickup once it is picked up
     }
     // Coroutine to respawn the pickup after it is picked up
     private IEnumerator RespawnPickupEvent()

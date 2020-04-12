@@ -50,15 +50,21 @@ public class GameManager : MonoBehaviour
     public List<GameObject> enemyPrototypes; // List of enemy prefabs
     public List<Transform> enemySpawnLocations; // List of enemy spawn locations
     public List<GameObject> activeEnemies; // List of active enemies
+    public List<Transform> enemyWaypoints;
     public int maxEnemies = 1; // Maximum number of enemies spawned
     public int currentEnemies = 0; // Tracks current number of enemies
     public float enemyRespawnDelay = 3.0f; // Duration to wait before spawning/respawning enemies
 
     [Header("Empty Shell Objects")]
-    public Transform pickupShell;
-    public Transform playerShell;
-    public Transform enemyShell;
-    public Transform weaponShell;
+    public Transform pickupShell; // Empty Game object used to contain all pickups
+    public Transform playerShell; // Empty Game object used to contain all players
+    public Transform enemyShell; // Empty Game object used to contain all enemies
+    public Transform weaponShell; // Empty Game object used to contain all weapons
+
+    [Header("Enemy Patrol Data")]
+    public Vector3 lastSoundLocation; // Location of the last time an AI heard the player
+    public Vector3 lastPlayerLocation; // Location of the last time an AI saw the player
+    public bool isAlerted; // Indicates if an enemy has seen the player and alerts all allies
 
     [Header("Other Settings")]
     public GameState gameState; // Tracks the current game state using an enum

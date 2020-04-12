@@ -11,6 +11,8 @@ TagManager:
   - AI
   - WeaponContainer
   - Weapon
+  - Arena
+  - Enemy
   layers:
   - Default
   - TransparentFX
@@ -23,7 +25,7 @@ TagManager:
   - Player
   - Enemy
   - Projectiles
-  - 
+  - Environment
   - 
   - 
   - 

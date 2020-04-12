@@ -31,7 +31,11 @@ public class Rifle : ProjectileWeapon
 
             // Create a projectile instance (adding recoil by adjusting the rotation of the projectiles slightly using "Quaternion.Euler(Random.onUnitSphere * GetRecoil())"
             GameObject projectileClone = Instantiate(projectile, barrel.position, barrel.rotation * Quaternion.Euler(Random.onUnitSphere * GetRecoil())) as GameObject;
+
+            // Add force outward from the barrel
             projectileClone.GetComponent<Rigidbody>().AddRelativeForce(Vector3.forward * 10, ForceMode.VelocityChange);
+
+            // Calculate damage (base or crit)
             projectileClone.GetComponent<Projectile>().damage = CalculateDamage();
 
             // Destroy the projectileClone after a set duration

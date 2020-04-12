@@ -16,15 +16,13 @@ MonoBehaviour:
   fieldOfView: 45
   maxViewDistance: 10
   hearingRadius: 5
-  waitDuration: 0
-  waypointRange: 1
+  waitDuration: 10
+  waypointRange: 3
   searchDuration: 3
   investigateDuration: 3
   alertDuration: 3
   avoidanceDistance: 2
   rotationHigh: 3
   rotationLow: 1
-  randomRotation: 0
-  lastSoundLocation: {x: 0, y: 0, z: 0}
-  canHear: 0
-  lastPlayerLocation: {x: 0, y: 0, z: 0}
+  rotationSpeed: 50
+  criticalHealth: 500

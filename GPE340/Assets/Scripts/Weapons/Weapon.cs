@@ -5,8 +5,8 @@ using UnityEngine;
 public abstract class Weapon : MonoBehaviour
 {
     [SerializeField] private float damage; // Damage value
-    [SerializeField] private float attackAngle;
-    [SerializeField] private float effectiveRange;
+    [SerializeField] private float attackAngle; // Attack angle is used to determine how far off center an AI can attack with the current weapon
+    [SerializeField] private float effectiveRange; // Effective range of the weapon (How far it can shoot)
     private bool isPlayerWeapon; // Indicates if the player controls the weapon
     [HideInInspector] public PlayerPawn player; // Component variable for the PlayerPawn
 

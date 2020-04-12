@@ -78,7 +78,7 @@ public class PlayerController : Base_Controller
             // Method to fire weapon (default is mouse0)
             if (Input.GetButton("Fire1"))
             {
-                playerPawn.Attack(); // Call the attack method
+                playerPawn.TriggerAttack(); // Call the attack method
             }
         }
     }

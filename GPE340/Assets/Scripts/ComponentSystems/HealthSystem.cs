@@ -13,7 +13,7 @@ public class HealthSystem : MonoBehaviour
     [SerializeField] private UnityEvent onDeath; // Event that will run when the object dies
     private Base_Pawn bp; // This is the parent data class that has the health properties and methods
     private bool isPlayer; // Indicates if the current object is the player (required to update the player HUD)
-    private bool isDead = false;
+    private bool isDead = false; // Indicates if the player is dead, prevents shotgun from killing the player multiple times with same shot
     // Start is called before the first frame update
     void Start()
     {
@@ -44,7 +44,7 @@ public class HealthSystem : MonoBehaviour
         {
             bp.SetCurrentHealth(0.0f); // Set health to 0
             DoDeath(); // Run the DoDeath method
-            isDead = true;
+            isDead = true; // Bool to indicate the pawn is dead
         }
     }
     // Method that heals an object
@@ -74,19 +74,19 @@ public class HealthSystem : MonoBehaviour
         {
             if (isPlayer) // If the object is the player
             {
-                bp.UnequipWeapon();
-                GameManager.instance.activePlayers.Remove(this.gameObject);
+                bp.UnequipWeapon(); // Unequip weapon on death
+                GameManager.instance.activePlayers.Remove(this.gameObject); // Remove from activePlayers list
                 GameManager.instance.InstantiatePlayer(); // Instantiate a new player
                 Destroy(this.gameObject); // Destroy the current gameObject
             }
             else // If not the player (then the object is the enemy)
             {
-                bp.UnequipWeapon();
+                bp.UnequipWeapon(); // Unequip weapon on death
                 GameManager.instance.currentEnemies--; // Update enemy count
-                GameManager.instance.activeEnemies.Remove(this.gameObject);
+                GameManager.instance.activeEnemies.Remove(this.gameObject); // Remove from activeEnemies list
                 GameManager.instance.InstantiateEnemies(); // Instantiate enemies
                 Destroy(this.gameObject, 3.0f); // Destroy the current gameObject
-                bp.EnableRagdoll();
+                bp.EnableRagdoll(); // Enable ragdoll physics
             }
             onDeath.Invoke(); // TODO: Animation "Death"
 

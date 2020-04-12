@@ -51,12 +51,12 @@ public class ProjectileWeapon : Weapon
             {
                 float critDamagePercentage = player.GetCritDamage(); // Get CritDamage value
                 float critDamageAmount = GetDamage() * critDamagePercentage; // Set the damage amount to the base damage * critDamagePercentage
-                Debug.Log("Crit Damage"); // TODO: This will temporarily indicate a crit hit in the console (Add indicator to canvas screen)
+                //Debug.Log("Crit Damage"); // TODO: This will temporarily indicate a crit hit in the console (Add indicator to canvas screen)
                 return critDamageAmount; // Return crit damage
             }
             else
             {
-                Debug.Log("Normal Damage"); // TODO: This will temporarily indicate a normal hit in the console (Add indicator to canvas screen)
+                //Debug.Log("Normal Damage"); // TODO: This will temporarily indicate a normal hit in the console (Add indicator to canvas screen)
                 return GetDamage(); // Return base damage if crit fails
             }
         }

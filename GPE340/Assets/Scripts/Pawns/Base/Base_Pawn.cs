@@ -23,7 +23,6 @@ public abstract class Base_Pawn : MonoBehaviour
     [Header("Health Settings")]
     [SerializeField] private float currentHealth; // Variable to contain the object's current health
     [SerializeField] private float maxHealth; // Maximum health that the object can have
-    public bool isRagdoll = false;
 
     /// <summary>
     /// Getter method for currentHealth
@@ -192,8 +191,8 @@ public abstract class Base_Pawn : MonoBehaviour
             anim.SetIKHintPositionWeight(AvatarIKHint.LeftElbow, 0f); // Left elbow position
         }
     }
-    // Attack method will simply run the UseWeapon method from the ProjectileWeapon script attached to the currently equippedWeapon
-    public void Attack()
+    // TriggerAttack method will simply run the UseWeapon method from the ProjectileWeapon script attached to the currently equippedWeapon
+    public void TriggerAttack()
     {
         if (isWeaponEquipped) // Check if a weapon is equipped
         {
@@ -204,43 +203,44 @@ public abstract class Base_Pawn : MonoBehaviour
             // TODO: No weapon equipped/Possibly add melee weapons
         }
     }
-
+    // This method will enable the ragdoll physics for the current pawn
     public void EnableRagdoll()
     {
-        Rigidbody[] childRBs = GetComponentsInChildren<Rigidbody>();
-        foreach (Rigidbody rb in childRBs)
+        // Get an array with all the rigidbody components in the current game object and children
+        Rigidbody[] childRBs = GetComponentsInChildren<Rigidbody>(); 
+        foreach (Rigidbody rb in childRBs) // Loop through each rigidbody
         {
-            rb.isKinematic = false;
+            rb.isKinematic = false; // Make sure Kinematic is false
+        }
+        // Get an array with all the collider components in the current game object and children
+        Collider[] childCols = GetComponentsInChildren<Collider>(); 
+        foreach (Collider col in childCols) // Loop through each collider
+        {
+            col.enabled = true; // Enable all the colliders
         }
 
-        Collider[] childCols = GetComponentsInChildren<Collider>();
-        foreach (Collider col in childCols)
-        {
-            col.enabled = true;
-        }
-
-        GetComponent<CapsuleCollider>().enabled = false;
-        GetComponent<Rigidbody>().isKinematic = true;
-        anim.enabled = false;
+        GetComponent<CapsuleCollider>().enabled = false; // Disable the main collider
+        GetComponent<Rigidbody>().isKinematic = true; // Set the main rigidbody to kinematic
+        anim.enabled = false; // Disable animations
     }
-
+    // This method will disable the ragdoll physics for the current pawn
     public void DisableRagdoll()
     {
+        // Get an array with all the rigidbody components in the current game object and children
         Rigidbody[] childRBs = GetComponentsInChildren<Rigidbody>();
-        foreach (Rigidbody rb in childRBs)
+        foreach (Rigidbody rb in childRBs) // Loop through each rigidbody
         {
-            rb.isKinematic = true;
+            rb.isKinematic = true; // Make sure Kinematic is true
         }
-
+        // Get an array with all the collider components in the current game object and children
         Collider[] childCols = GetComponentsInChildren<Collider>();
-        foreach (Collider col in childCols)
+        foreach (Collider col in childCols) // Loop through each collider
         {
-            col.enabled = false;
+            col.enabled = false; // Disable all the colliders
         }
 
-        GetComponent<CapsuleCollider>().enabled = true;
-        GetComponent<Rigidbody>().isKinematic = false;
-        anim.enabled = true;
+        GetComponent<CapsuleCollider>().enabled = true; // Enable the main collider
+        GetComponent<Rigidbody>().isKinematic = false; // Set the main rigidbody to not kinematic
+        anim.enabled = true; // Enable animations
     }
-
 }

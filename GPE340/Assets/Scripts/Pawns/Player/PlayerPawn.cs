@@ -116,8 +116,6 @@ public class PlayerPawn : Base_Pawn
         base.EquipWeapon(weap); // Run the base EquipWeapon method
         equippedWeapon.GetComponent<Weapon>().SetIsPlayerWeapon(true); // Indicates the current pawn is the player
         weaponComponent.player = GetComponent<PlayerPawn>(); // Set player pawn component, needed to set hand and elbow IK positions/rotations
-
-        // TODO: Allow weapon to be picked up by AI
     }
 
     /// <summary>
@@ -130,8 +128,6 @@ public class PlayerPawn : Base_Pawn
         {
             equippedWeapon.GetComponent<Weapon>().SetIsPlayerWeapon(false); // Indicate the pawn does not control the weapon
             weaponComponent.player = null; // Set the player pawn component back to null since pawn no longer controls weapon
-
-            // TODO: Allow weapon to be dropped by AI
         }
     }
 }
