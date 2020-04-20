@@ -12,8 +12,10 @@ public class HealthSystem : MonoBehaviour
     [SerializeField] private UnityEvent onDamage; // Event that will run when the object is damaged
     [SerializeField] private UnityEvent onDeath; // Event that will run when the object dies
     private Base_Pawn bp; // This is the parent data class that has the health properties and methods
+    private AIPawn aiPawn;
     private bool isPlayer; // Indicates if the current object is the player (required to update the player HUD)
     private bool isDead = false; // Indicates if the player is dead, prevents shotgun from killing the player multiple times with same shot
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,6 +27,7 @@ public class HealthSystem : MonoBehaviour
         else if (GetComponent<AIPawn>()) // If there is an AIPawn component, then the object is an AI (Enemy)
         {
             bp = GetComponent<AIPawn>(); // Set the Base_Data component to AIData
+            aiPawn = GetComponent<AIPawn>();
             isPlayer = false; // This is not the player
         }
     }
@@ -36,8 +39,14 @@ public class HealthSystem : MonoBehaviour
         {
             bp.SetCurrentHealth(bp.GetCurrentHealth() - dmgAmt); // Set current health by subtracting damage amount
 
-            CallUpdateHealth(); // Update the player HUD health bar
-
+            if (!aiPawn)
+            {
+                CallUpdateHealth(); // Update the player HUD health bar
+            }
+            else
+            {
+                aiPawn.UpdateEnemyHealthBar(); // Updates the enemy's health bar when it takes damage
+            }
             onDamage.Invoke(); // TODO: Animation "Taking Damage"
         }
         else // If the player will run out of health when damaged...
@@ -74,23 +83,39 @@ public class HealthSystem : MonoBehaviour
         {
             if (isPlayer) // If the object is the player
             {
-                bp.UnequipWeapon(); // Unequip weapon on death
-                GameManager.instance.activePlayers.Remove(this.gameObject); // Remove from activePlayers list
-                GameManager.instance.InstantiatePlayer(); // Instantiate a new player
-                Destroy(this.gameObject); // Destroy the current gameObject
+                if (GameManager.instance.playerLives > 0) // Check if player has lives remaining
+                { 
+                    bp.UnequipWeapon(); // Unequip weapon on death
+                    GameManager.instance.activePlayers.Remove(this.gameObject); // Remove from activePlayers list
+                    GameManager.instance.InstantiatePlayer(); // Instantiate a new player
+                    Destroy(this.gameObject); // Destroy the current gameObject
+                    GameManager.instance.playerLives--; // Deduct one life
+                    GameManager.instance.playerHUD.UpdateLives(); // Update player lives on HUD
+                }
+                else if (GameManager.instance.playerLives <= 0) // If the player is out of lives
+                {
+                    // Game over
+                    GameManager.instance.activePlayers.Remove(this.gameObject); // Remove from activePlayers list
+                    Destroy(this.gameObject); // Destroy the current gameObject
+                    GameManager.instance.SetGameState(GameManager.GameState.Postgame); // Set the game state to post game when player is out of lives
+                }
+
             }
             else // If not the player (then the object is the enemy)
             {
-                bp.UnequipWeapon(); // Unequip weapon on death
-                GameManager.instance.currentEnemies--; // Update enemy count
-                GameManager.instance.activeEnemies.Remove(this.gameObject); // Remove from activeEnemies list
-                GameManager.instance.InstantiateEnemies(); // Instantiate enemies
-                Destroy(this.gameObject, 3.0f); // Destroy the current gameObject
-                bp.EnableRagdoll(); // Enable ragdoll physics
+                if (GetComponent<AIPawn>()) // Ensure there is an AIPawn component
+                {
+                    AIPawn aiPawn = GetComponent<AIPawn>(); // Get the AIPawn component
+                    aiPawn.UnequipWeapon(); // Unequip weapon on death
+                    aiPawn.DropItem(); // Run the drop item method on enemy death
+                    GameManager.instance.currentEnemies--; // Update enemy count
+                    GameManager.instance.activeEnemies.Remove(this.gameObject); // Remove from activeEnemies list
+                    GameManager.instance.InstantiateEnemies(); // Instantiate enemies
+                    Destroy(this.gameObject, 3.0f); // Destroy the current gameObject
+                    aiPawn.EnableRagdoll(); // Enable ragdoll physics
+                }
             }
             onDeath.Invoke(); // TODO: Animation "Death"
-
-
         }
     }
     // Method that will update the player's HUD with currentHealthPercentage

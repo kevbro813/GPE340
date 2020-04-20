@@ -116,6 +116,19 @@ public class PlayerPawn : Base_Pawn
         base.EquipWeapon(weap); // Run the base EquipWeapon method
         equippedWeapon.GetComponent<Weapon>().SetIsPlayerWeapon(true); // Indicates the current pawn is the player
         weaponComponent.player = GetComponent<PlayerPawn>(); // Set player pawn component, needed to set hand and elbow IK positions/rotations
+        if (GameManager.instance.weaponIcon == GameManager.WeaponIcon.Pistol) // If the weapon icon is the pistol
+        {
+            GameManager.instance.currentWeaponIcon = GameManager.instance.weaponIconsList[(int)GameManager.WeaponIcon.Pistol]; // Set the currentWeaponIcon to the pistol icon prototype
+        }
+        if (GameManager.instance.weaponIcon == GameManager.WeaponIcon.Rifle) // If the weapon icon is the rifle
+        {
+            GameManager.instance.currentWeaponIcon = GameManager.instance.weaponIconsList[(int)GameManager.WeaponIcon.Rifle]; // Set the currentWeaponIcon to the rifle icon prototype
+        }
+        if (GameManager.instance.weaponIcon == GameManager.WeaponIcon.Shotgun) // If the weapon icon is the shotgun
+        {
+            GameManager.instance.currentWeaponIcon = GameManager.instance.weaponIconsList[(int)GameManager.WeaponIcon.Shotgun]; // Set the currentWeaponIcon to the shotgun icon prototype
+        }
+        GameManager.instance.playerHUD.SetWeaponIcon(); // Update the weapon icons on the HUD
     }
 
     /// <summary>
@@ -129,5 +142,8 @@ public class PlayerPawn : Base_Pawn
             equippedWeapon.GetComponent<Weapon>().SetIsPlayerWeapon(false); // Indicate the pawn does not control the weapon
             weaponComponent.player = null; // Set the player pawn component back to null since pawn no longer controls weapon
         }
+        // This will inactivate the weaponIcon gameobject in the playerHUD script
+        GameManager.instance.currentWeaponIcon = null; // Set currentWeaponIcon to null 
+        GameManager.instance.playerHUD.SetWeaponIcon(); // Update the weapon icon on the player HUD
     }
 }

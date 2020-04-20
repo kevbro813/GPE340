@@ -69,6 +69,7 @@
     <Compile Include="Assets\Scripts\ComponentSystems\AIHearing.cs" />
     <Compile Include="Assets\Scripts\ComponentSystems\AIVision.cs" />
     <Compile Include="Assets\Scripts\ComponentSystems\HealthSystem.cs" />
+    <Compile Include="Assets\Scripts\ItemDrops\ItemDrops.cs" />
     <Compile Include="Assets\Scripts\Level\Spawn.cs" />
     <Compile Include="Assets\Scripts\Managers\CameraManager.cs" />
     <Compile Include="Assets\Scripts\Managers\GameManager.cs" />
@@ -87,8 +88,10 @@
     <Compile Include="Assets\Scripts\Pickups\Powerups\CritDamage.cs" />
     <Compile Include="Assets\Scripts\Pickups\Powerups\Damage.cs" />
     <Compile Include="Assets\Scripts\Pickups\Powerups\Health.cs" />
+    <Compile Include="Assets\Scripts\PropertyDrawer\ItemDropDrawer.cs" />
+    <Compile Include="Assets\Scripts\UI\EndGame.cs" />
+    <Compile Include="Assets\Scripts\UI\Menus.cs" />
     <Compile Include="Assets\Scripts\UI\PlayerHUD.cs" />
-    <Compile Include="Assets\Scripts\UI\StartMenu.cs" />
     <Compile Include="Assets\Scripts\Weapons\Pistol.cs" />
     <Compile Include="Assets\Scripts\Weapons\Projectile.cs" />
     <Compile Include="Assets\Scripts\Weapons\ProjectileWeapon.cs" />

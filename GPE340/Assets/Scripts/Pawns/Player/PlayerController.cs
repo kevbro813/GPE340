@@ -22,13 +22,19 @@ public class PlayerController : Base_Controller
     // Update is called once per frame
     private void Update()
     {
+        // Toggle menu by switching isPaused bool on and off. This is before isPaused is checked to allow player can exit pause with escape button
+        if (Input.GetButtonDown("Cancel"))
+        {
+            GameManager.instance.isPaused = !GameManager.instance.isPaused;
+        }
+        if (GameManager.instance.isPaused) //Check if game is paused and freeze all player inputs
+            return;
         if (!playerPawn) // Check if the playerPawn is null
         {
             Debug.Log("Null Reference Exception: playerPawn not set to an instance."); // Send error message
         }
         else // If the playerPawn is not null...
         {
-            //playerPawn.Ragdoll();
             inputVertical = Input.GetAxis("Vertical"); // Set the inputVertical to the Vertical axis value
             inputHorizontal = Input.GetAxis("Horizontal"); // Set the inputHorizontal to the Horizontal axis value
 
@@ -40,7 +46,7 @@ public class PlayerController : Base_Controller
             moveDirection = Vector3.ClampMagnitude(moveDirection, GameManager.instance.maxSpeed);
 
             // Toggles world and self space (If true, the controls will be in world space, false is self)
-            if (GameManager.instance.isMovementWorldSpace) 
+            if (GameManager.instance.isMovementWorldSpace)
             {
                 moveDirection = tf.InverseTransformDirection(moveDirection); // InverseTransformDirection method converts the moveDirection Vector3 from self to world space
             }
@@ -71,7 +77,7 @@ public class PlayerController : Base_Controller
                 playerPawn.FaceMouseDir(); // Face the player in the direction of the mouse
             }
             // Method to discard weapon (default is G)
-            if (Input.GetButtonDown("Discard Weapon")) 
+            if (Input.GetButtonDown("Discard Weapon"))
             {
                 playerPawn.UnequipWeapon(); // Call the UnequipWeapon method
             }

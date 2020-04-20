@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 // GameManager script is a singleton
 public class GameManager : MonoBehaviour
@@ -8,6 +9,7 @@ public class GameManager : MonoBehaviour
     [HideInInspector] public static GameManager instance; // Static instance of the GameManager for Singleton Pattern
     [Header ("Camera Settings")]
     public Camera mainCam; // Main camera component
+    public bool isCursorLocked = true; // Is cursor locked and invisible
     public bool isCameraMouseControlled = false; // Bool to indicate if the camera is being controlled by the mouse, false means the camera will trail the player
     public bool isPlayerMouseControlled = true; // Bool to indicate if the player is controlled by the mouse, false means the player is not controlled by the mouse, but does not mean the mouse controls the camera
     public bool isMovementWorldSpace = true; // Toggles world and self space with regards to player controls
@@ -21,6 +23,7 @@ public class GameManager : MonoBehaviour
     public float minZoomDistance = 1.5f; // Lower bound clamp for the zoom distance to prevent clipping inside pawn
     public float maxZoomDistance = 10.0f; // Upper bound clamp for the zoom distance to prevent camera from spinning uncontrollably
 
+
     [Header("Player Settings")]
     public List<GameObject> activePlayers; // List of currently active players
     public Transform playerSpawn; // List of player spawns
@@ -30,6 +33,8 @@ public class GameManager : MonoBehaviour
     public GameObject hudObject; // HUD gameObject that can be set active/inactive
     public GameObject startMenu; // Start menu gameObject
     public PlayerHUD playerHUD; // Player HUD Component, has all methods used to update the HUD
+    public GameObject pauseMenu; // Pause menu gameObject
+    public Menus menuComponent; // Component for the pause menu
 
     [Header("Pickup Settings")]
     public List<GameObject> pickupPrototypes; // List of pickup prefabs
@@ -50,7 +55,7 @@ public class GameManager : MonoBehaviour
     public List<GameObject> enemyPrototypes; // List of enemy prefabs
     public List<Transform> enemySpawnLocations; // List of enemy spawn locations
     public List<GameObject> activeEnemies; // List of active enemies
-    public List<Transform> enemyWaypoints;
+    public List<Transform> enemyWaypoints; // List of enemy weapoints
     public int maxEnemies = 1; // Maximum number of enemies spawned
     public int currentEnemies = 0; // Tracks current number of enemies
     public float enemyRespawnDelay = 3.0f; // Duration to wait before spawning/respawning enemies
@@ -60,6 +65,7 @@ public class GameManager : MonoBehaviour
     public Transform playerShell; // Empty Game object used to contain all players
     public Transform enemyShell; // Empty Game object used to contain all enemies
     public Transform weaponShell; // Empty Game object used to contain all weapons
+    public Transform itemDropShell; // Empty game object used to contain items that are dropped
 
     [Header("Enemy Patrol Data")]
     public Vector3 lastSoundLocation; // Location of the last time an AI heard the player
@@ -68,8 +74,14 @@ public class GameManager : MonoBehaviour
 
     [Header("Other Settings")]
     public GameState gameState; // Tracks the current game state using an enum
+    public enum GameState { Pregame, Active, Postgame, Pause, PrePause, Resume, Quit } // Enum for game state
 
-    public enum GameState { Pregame, Active, Postgame, Pause, Resume } // Enum for game state
+    public bool isPaused; // Bool to indicate if the game is paused
+    public int playerLives; // Tracks the number of lives the player has
+    public List<Sprite> weaponIconsList; // List of weapon icons
+    public Sprite currentWeaponIcon; // Current weapon icon based on the currently equipped weapon
+    public WeaponIcon weaponIcon; // Enum for weapon icons
+    public enum WeaponIcon { Pistol, Rifle, Shotgun, None };
 
     private void Awake()
     {
@@ -77,24 +89,27 @@ public class GameManager : MonoBehaviour
         if (!instance) // If the instance is null...
         {
             instance = this; // This instance is set to the static instance
-            DontDestroyOnLoad(gameObject); // Do not destroy GameManager on load
+            //DontDestroyOnLoad(gameObject); // Destroy on load for new games
         }
         else // If the instance is not null...
         {
             Destroy(gameObject); // Destroy the gameObject
         }
-        isCameraMouseControlled = true; // Set camera to mouse controlled (preferred setting for this game)
 
-        gameState = GameState.Pregame; // Set initial game state
+        hudObject = GameObject.FindWithTag("HUD"); // Set the hudObject by finding the object tagged with "HUD"
+        startMenu = GameObject.FindWithTag("StartMenu"); // Set the startMenu by finding the object tagged with "StartMenu"
+        pauseMenu = GameObject.FindWithTag("PauseMenu"); // Set the pauseMenu
+        playerHUD = hudObject.GetComponent<PlayerHUD>(); // Set the playerHUD component
+        menuComponent = pauseMenu.GetComponentInParent<Menus>(); // Get the UI menu component attached to the parent // TODO: MIGHT NOT NEED THIS
+        mainCam = Camera.main; // Set the mainCam variable to the main camera
     }
     private void Start()
     {
-        hudObject = GameObject.FindWithTag("HUD"); // Set the hudObject by finding the object tagged with "HUD"
-        startMenu = GameObject.FindWithTag("StartMenu"); // Set the startMenu by finding the object tagged with "StartMenu"
+        gameState = GameState.Pregame; // Set initial game state
         startMenu.SetActive(true); // Activate the start menu at the beginning of the game
         hudObject.SetActive(false); // Deactivate the HUD at the beginning of the game
-        mainCam = Camera.main; // Set the mainCam variable to the main camera
-        playerHUD = hudObject.GetComponent<PlayerHUD>(); // Set the playerHUD component
+        pauseMenu.SetActive(false); // Deactivate the Pause menu at the beginning of the game
+        playerLives = 3; // Set player lives to 3
     }
     // TODO: Complete Main Game FSM
     private void Update()
@@ -106,6 +121,10 @@ public class GameManager : MonoBehaviour
         if (gameState == GameState.Active) // If the game is currently active...
         {
             DoActive(); // Run DoActive method
+            if (isPaused) // If game is paused
+            {
+                SetGameState(GameState.PrePause); // Transition to prepause state
+            }
         }
         if (gameState == GameState.Postgame) // If the game is finished...
         {
@@ -114,10 +133,26 @@ public class GameManager : MonoBehaviour
         if (gameState == GameState.Pause) // If the game is paused...
         {
             DoPause(); // Run DoPause method
+            if (!isPaused) // If game is not paused
+            {
+                SetGameState(GameState.Resume); // Transition to resume state
+            }
         }
         if (gameState == GameState.Resume) // If the game is resumed...
         { 
             DoResume(); // Run DoResume method
+            SetGameState(GameState.Active); // Set to active game state
+        }
+
+        if (gameState == GameState.Quit) // Quit game
+        {
+            DoQuit();
+        }
+
+        if (gameState == GameState.PrePause) // Pre pause state
+        {
+            DoPrePause(); // Run prepause state
+            SetGameState(GameState.Pause); // Transition directly to pause state
         }
     }
 
@@ -141,29 +176,66 @@ public class GameManager : MonoBehaviour
 
         // Instantiate Weapons
         InstantiateWeapons();
+
+        // Set the game to active state
+        SetGameState(GameState.Active);
+    }
+    private void DoPrePause() // PrePause runs before game enters pause since the following code should only run once
+    {
+        Debug.Log("PrePause");
+        pauseMenu.SetActive(true); // Activate the pause menu
+        menuComponent.UpdateToggles(); // Update the toggle options in the pause menu
+        LockCursor(false); // Set the cursor mode to not locked
+        Time.timeScale = 0f; // Pause time
+    }
+    private void DoPregame() // Run pregame state
+    {
+        Debug.Log("Pregame");
+        startMenu.SetActive(true); // Set the start menu to active
+    }
+    private void DoActive() // Run the active state
+    {
+        Debug.Log("Active");
+        LockCursor(true); // Set cursor mode to locked
+    }
+    private void DoPostgame() // Run post game state
+    {
+        Debug.Log("Postgame");
+        LockCursor(false); // Set cursor to not locked
+        SetGameState(GameState.Pregame); // Enter pregame state
+        Time.timeScale = 1f; // Unpause time
+        UnityEngine.SceneManagement.SceneManager.LoadScene(1); // Load end game scene
+    }
+    private void DoPause() // State when game is currently paused
+    {
+        Debug.Log("Paused");
+        // Game in paused state, do nothing
+    }
+    private void DoResume() // Run the resume state (go from paused to unpaused)
+    {
+        Debug.Log("Resume");
+        // Unpauses the game
+        pauseMenu.SetActive(false); // Deactivate the pause menu
+        LockCursor(true); // Set the cursor mode to locked
+        Time.timeScale = 1f; // Activate time
     }
 
-    public void DoPregame()
+    private void DoQuit() // Quit game
     {
-        // TODO: Default State that runs before game is active
-    }
-    public void DoActive()
-    {
-        // TODO: State of an active game
-    }
-    public void DoPostgame()
-    {
-        // TODO: State after the game concludes
-    }
-    public void DoPause()
-    {
-        // TODO: Pauses the game
-    }
-    public void DoResume()
-    {
-        // TODO: Unpauses the game
+        Debug.Log("Quit");
+        Application.Quit(); // Quit application
+
+        // This will only run in the unity editor and will close out the editor play mode
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#endif
     }
 
+    // Set the game state
+    public void SetGameState(GameState gs)
+    {
+        gameState = gs;
+    }
     // Instantiate the player, reset the player's settings, update the playerHUD and set the camera's follow object
     public void InstantiatePlayer()
     {
@@ -261,5 +333,22 @@ public class GameManager : MonoBehaviour
 
             activeEnemies.Add(enemyClone); // Add to list of available enemies
         } 
+    }
+
+    // Lock or unlock the cursor, allows use of menus while paused
+    public void LockCursor(bool isLocked)
+    {
+        isCursorLocked = isLocked; // Set isCursorLocked
+
+        if (isCursorLocked) // If the cursor is locked
+        {
+            Cursor.lockState = CursorLockMode.Locked; // Lock the cursor (It will stay centered)
+            Cursor.visible = false; // Makes the cursor invisible
+        }
+        else // If the cursor is not locked
+        {
+            Cursor.lockState = CursorLockMode.None; // Unlocks the cursor, allowing it to be moved anywhere
+            Cursor.visible = true; // Makes the cursor visible
+        }
     }
 }

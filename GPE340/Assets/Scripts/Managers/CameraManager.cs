@@ -29,9 +29,6 @@ public class CameraManager : MonoBehaviour
         {
             if (GameManager.instance.isCameraMouseControlled) // If the camera is mouse controlled...
             {
-                Cursor.lockState = CursorLockMode.Locked; // Lock the cursor (It will not go outside of the game window)
-                Cursor.visible = false; // Makes the cursor invisible
-
                 currentX += Input.GetAxis("Mouse X"); // Get the current x-axis position of the mouse
                 currentY -= Input.GetAxis("Mouse Y"); // Get the current y-axis position of the mouse
                 currentY = Mathf.Clamp(currentY, Y_ANGLE_MIN, Y_ANGLE_MAX); // Clamp the Y angle to prevent the camera from going beneath the ground or flipping the camera once too far overhead
@@ -41,9 +38,6 @@ public class CameraManager : MonoBehaviour
             }
             else
             {
-                Cursor.lockState = CursorLockMode.None; // Unlocks the cursor, allowing it to be seen
-                Cursor.visible = true; // Makes the cursor visible
-
                 if (GameManager.instance.isMoveTowards) // If the camera uses the MoveTowards method...
                 {
                     float step = GameManager.instance.camTrailSpeed * Time.deltaTime; // Calculate step based on speed multiplied by deltaTime
@@ -68,16 +62,19 @@ public class CameraManager : MonoBehaviour
     // LateUpdate method (Called after Update method)
     private void LateUpdate()
     {
-        if (followObject != null) // Check if the follow object is not null
+        if (!GameManager.instance.isPaused) // Freezes camera while game is paused
         {
-            if (GameManager.instance.isCameraMouseControlled) // if the camera is mouse controlled...
+            if (followObject != null) // Check if the follow object is not null
             {
-                // Create a new Vector3, setting the z value to the inverse of the camZoomDistance
-                Vector3 dir = new Vector3(0, 0, -GameManager.instance.camZoomDistance);
-                Quaternion rotation = Quaternion.Euler(currentY, currentX, 0); // Calculate the rotation of the x and y axes based on the currentY and currentX mouse values
+                if (GameManager.instance.isCameraMouseControlled) // if the camera is mouse controlled...
+                {
+                    // Create a new Vector3, setting the z value to the inverse of the camZoomDistance
+                    Vector3 dir = new Vector3(0, 0, -GameManager.instance.camZoomDistance);
+                    Quaternion rotation = Quaternion.Euler(currentY, currentX, 0); // Calculate the rotation of the x and y axes based on the currentY and currentX mouse values
 
-                tf.position = fotf.position + rotation * dir; // Change the camera position based on the position of the followObject by adjusting the rotation and direction
-                tf.LookAt(fotf.position + transform.up); // LookAt method used to turn the camera in the direction of the followObject using world space
+                    tf.position = fotf.position + rotation * dir; // Change the camera position based on the position of the followObject by adjusting the rotation and direction
+                    tf.LookAt(fotf.position + transform.up); // LookAt method used to turn the camera in the direction of the followObject using world space
+                }
             }
         }
     }

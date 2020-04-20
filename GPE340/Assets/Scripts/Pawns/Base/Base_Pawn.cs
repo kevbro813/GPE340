@@ -74,14 +74,27 @@ public abstract class Base_Pawn : MonoBehaviour
         weap.layer = 8; // Set weapon layer to "Player"
 
         // If the weapon is a rifle or shotgun
-        if (weap.GetComponent<Rifle>() || weap.GetComponent<Shotgun>())
+        if (weap.GetComponent<Rifle>())
         {
             anim.SetInteger("weaponType", 1); // Set the animation style to Rifle (also works for shotgun)
+            GameManager.instance.weaponIcon = GameManager.WeaponIcon.Rifle; // Set Icon to rifle
+
+        }
+        // If the weapon is shotgun
+        else if (weap.GetComponent<Shotgun>())
+        {
+            anim.SetInteger("weaponType", 1); // Set the animation style to Rifle (also works for shotgun)
+            GameManager.instance.weaponIcon = GameManager.WeaponIcon.Shotgun;// Set Icon to shotgun
         }
         // If the weapon is a pistol
         else if (weap.GetComponent<Pistol>())
         {
             anim.SetInteger("weaponType", 2); // Set the animation style to pistol
+            GameManager.instance.weaponIcon = GameManager.WeaponIcon.Pistol; // Set Icon to pistol
+        }
+        else // If the player has no weapon
+        {
+            GameManager.instance.weaponIcon = GameManager.WeaponIcon.None; // Set Icon to none
         }
         // Set the weapon's transform component
         weap_tf = weap.GetComponent<Transform>();

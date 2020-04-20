@@ -13,6 +13,9 @@ TagManager:
   - Weapon
   - Arena
   - Enemy
+  - PauseMenu
+  - EndGame
+  - ItemDrops
   layers:
   - Default
   - TransparentFX

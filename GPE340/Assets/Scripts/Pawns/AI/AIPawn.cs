@@ -1,19 +1,23 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 [RequireComponent(typeof(AIData))]
 // AIPawn has methods run by AI enemies
 public class AIPawn : Base_Pawn
 {
     [Header("AI Settings")]
-    public AIData aiData; // AIData (set in inspector)
-    public GameObject[] weaponSelection; // Array that contains the weapons available to the AI (Set in inspector)
+    [HideInInspector] public AIData aiData; // AIData (set in inspector)
+    [HideInInspector] public GameObject[] weaponSelection; // Array that contains the weapons available to the AI (Set in inspector)
     private AIVision aiVision; // Vision component
     private NavMeshAgent nma; // NavMeshAgent component
     private Animator anim; // Animator component
     private Rigidbody rb; // Rigidbody component
+
+    public Image enemyHealthBar;
 
     [Header("Patrol Settings")]
     public PatrolType patrolType; // Allows the patrol type to be changed in the Inspector
@@ -25,26 +29,30 @@ public class AIPawn : Base_Pawn
     private bool isPatrolForward = true; // Used in "PingPong" patrol type to loop through the waypoints in reverse order
 
     [Header("FSM Settings")]
-    public bool atWaypoint = false; // Indicates whether the AI is currently at a waypoint while patrolling
-    public bool atSearchLocation = false; // Indicates whether the AI is currently at the last known player location while searching
-    public bool atInvestigateLocation = false; // Indicates whether the AI is currently looking in the direction of a sound while investigating
-    public bool atAlertLocation = false; // Indicates whether the AI is currently at the alert location
-    public bool isInvestigating = false; // Switching from true to false allows the AI to transition from investigate state to patrol state
-    public bool isSearching = false; // Switching from true to false allows the AI to transition from search state to patrol state
-    public bool isAlertActive = false; // Switching from true to false allows the AI to transition from alert state to patrol state
-    public bool isFleeing = false; // Indicates if the current AI is fleeing the player
-    public bool canHear; // Used to activate AI Hearing
+    [HideInInspector] public bool atWaypoint = false; // Indicates whether the AI is currently at a waypoint while patrolling
+    [HideInInspector] public bool atSearchLocation = false; // Indicates whether the AI is currently at the last known player location while searching
+    [HideInInspector] public bool atInvestigateLocation = false; // Indicates whether the AI is currently looking in the direction of a sound while investigating
+    [HideInInspector] public bool atAlertLocation = false; // Indicates whether the AI is currently at the alert location
+    [HideInInspector] public bool isInvestigating = false; // Switching from true to false allows the AI to transition from investigate state to patrol state
+    [HideInInspector] public bool isSearching = false; // Switching from true to false allows the AI to transition from search state to patrol state
+    [HideInInspector] public bool isAlertActive = false; // Switching from true to false allows the AI to transition from alert state to patrol state
+    [HideInInspector] public bool isFleeing = false; // Indicates if the current AI is fleeing the player
+    [HideInInspector] public bool canHear; // Used to activate AI Hearing
     private bool isTurned = false; // Is the AI turned around (Used in Flee function)
     private float waitTime; // Used to track how long to wait at a waypoint while patrolling
     private float investigateTime; // How long the AI will investigate before returning to patrol
     private float searchTime; // How long the AI will search before returning to patrol
     private float alertTime; // How long the AI will be alert before returning to patrol
-    public float randomRotation; // Random value used to determine how long an AI will rotate while avoiding obstacles. This creates less predictable movement and patrol patterns
-    public float weaponEffectiveRange; // Effective range of the currently equipped weapon (Set when the weapon is equipped and used to determine attackRange)
-    public Vector3 lastSoundLocation; // lastSoundLocation vector set by raycast.point
-    public Vector3 lastPlayerLocation; // lastPlayerLocation vector set by raycast.point
+    [HideInInspector] public float randomRotation; // Random value used to determine how long an AI will rotate while avoiding obstacles. This creates less predictable movement and patrol patterns
+    [HideInInspector] public float weaponEffectiveRange; // Effective range of the currently equipped weapon (Set when the weapon is equipped and used to determine attackRange)
+    [HideInInspector] public Vector3 lastSoundLocation; // lastSoundLocation vector set by raycast.point
+    [HideInInspector] public Vector3 lastPlayerLocation; // lastPlayerLocation vector set by raycast.point
     [HideInInspector] public RaycastHit obstacleHit; // Raycast hit for obstacles
 
+    [Header("Item Drop Settings")]
+    public ItemDrops[] itemDrops;
+    public double itemDropChance = 0.5f;
+    public double[] cdfArray;
 
     // Override and use the Awake method
     public override void Awake() 
@@ -72,8 +80,14 @@ public class AIPawn : Base_Pawn
         }
     }
 
+    // Update the enemy's health bar
+    public void UpdateEnemyHealthBar()
+    {
+        enemyHealthBar.fillAmount = GetCurrentHealthPercentage(); // Change the health bar to match the enemy's health percentage
+    }
     private void Start()
     {
+        SetCDFArray(); // Set CDF array for weighted drops
         DisableRagdoll(); // Ensure ragdoll is disabled when the AI is spawned
         SetDefaultWeapon(); // Set the AI's default weapon (random assignment)
 
@@ -83,6 +97,36 @@ public class AIPawn : Base_Pawn
         waitTime = aiData.waitDuration; // How long the AI will wait at a waypoint
         alertTime = aiData.alertDuration; // How long the AI will be alerted before returning to patrol
         randomRotation = Random.Range(aiData.rotationLow, aiData.rotationHigh); // Create a randomRotation at start
+        SetCDFArray();
+    }
+    // Select an item to drop using Array.BinarySearch
+    public Object SelectItemToDrop()
+    {
+        System.Random rnd = new System.Random(); // Get a random double
+        double rand = rnd.NextDouble(); // Get the next random double in sequence
+        int index = System.Array.BinarySearch(cdfArray, rand * cdfArray.Last()); // Get a random value for index
+        if (index < 0) // Check if index is negative
+            index = ~index; // If negative then use bitwise 
+        return itemDrops[index].GetValue(); // Return object
+    }
+    // Create the cumulative distribution function array
+    public void SetCDFArray()
+    {
+        cdfArray = new double[itemDrops.Length]; // Create a new double array of itemDrops length
+        cdfArray[0] = itemDrops[0].GetChance(); // Set the first CDF to the first itemDrops value
+
+        for (int i = 1; i < cdfArray.Length; i++) // Loop through the rest of the CDF array
+        {
+            cdfArray[i] = cdfArray[i - 1] + itemDrops[i].GetChance(); // Set the CDF array to cumulative value of all previous indices
+        }
+    }
+    // Drop an item on when killed
+    public void DropItem()
+    {
+        if (Random.Range(0f, 1f) < itemDropChance) // Chance an item will drop
+        {
+            Instantiate(SelectItemToDrop(), tf.position + Vector3.up, Quaternion.identity); // Instantiate the selected item
+        }
     }
     // Override the UnequipWeapon method
     public override void UnequipWeapon()

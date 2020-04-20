@@ -132,47 +132,47 @@ public class AIController : Base_Controller
     // CALLS ENEMY PAWN FUNCTIONS
     public void DoIdle()
     {
-        Debug.Log("Idle");
+        //Debug.Log("Idle");
         aiPawn.Idle(); // Run idle method
     }
     public void DoPursue()
     {
-        Debug.Log("Pursue");
+        //Debug.Log("Pursue");
         aiPawn.Pursue(); // Run Pursue method
     }
     public void DoAttack()
     {
-        Debug.Log("Attack");
+        //Debug.Log("Attack");
         aiPawn.Attack(); // Run attack method
     }
     public void DoPatrol()
     {
-        Debug.Log("Patrol");
+        //Debug.Log("Patrol");
         aiPawn.Patrol(); // Run patrol method
     }
     public void DoFlee()
     {
-        Debug.Log("Flee");
+        //Debug.Log("Flee");
         aiPawn.Flee(); // Run Flee method
     }
     public void DoSearch()
     {
-        Debug.Log("Search");
+        //Debug.Log("Search");
         aiPawn.Search(); // Run Search method
     }
     public void DoInvestigate()
     {
-        Debug.Log("Investigate");
+        //Debug.Log("Investigate");
         aiPawn.Investigate(); // Run Investigate method
     }
     public void DoObstacleAvoidance()
     {
-        Debug.Log("Obstacle Avoidance");
+        //Debug.Log("Obstacle Avoidance");
         aiPawn.ObstacleAvoidance(aiPawn.obstacleHit); // Run Obstacle Avoidance
     }
     public void DoAlerted()
     {
-        Debug.Log("Alerted");
+        //Debug.Log("Alerted");
         aiPawn.Alerted(); // Run Alerted method
     }
 
