@@ -27,7 +27,7 @@ public class CameraManager : MonoBehaviour
         }
         else // If the follow object is not null
         {
-            if (GameManager.instance.isCameraMouseControlled) // If the camera is mouse controlled...
+            if (GameManager.instance.settings.isCameraMouseControlled) // If the camera is mouse controlled...
             {
                 currentX += Input.GetAxis("Mouse X"); // Get the current x-axis position of the mouse
                 currentY -= Input.GetAxis("Mouse Y"); // Get the current y-axis position of the mouse
@@ -66,7 +66,7 @@ public class CameraManager : MonoBehaviour
         {
             if (followObject != null) // Check if the follow object is not null
             {
-                if (GameManager.instance.isCameraMouseControlled) // if the camera is mouse controlled...
+                if (GameManager.instance.settings.isCameraMouseControlled) // if the camera is mouse controlled...
                 {
                     // Create a new Vector3, setting the z value to the inverse of the camZoomDistance
                     Vector3 dir = new Vector3(0, 0, -GameManager.instance.camZoomDistance);

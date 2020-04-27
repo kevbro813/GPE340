@@ -16,6 +16,7 @@ TagManager:
   - PauseMenu
   - EndGame
   - ItemDrops
+  - MusicSource
   layers:
   - Default
   - TransparentFX

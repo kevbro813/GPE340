@@ -15,6 +15,7 @@ public class HealthSystem : MonoBehaviour
     private AIPawn aiPawn;
     private bool isPlayer; // Indicates if the current object is the player (required to update the player HUD)
     private bool isDead = false; // Indicates if the player is dead, prevents shotgun from killing the player multiple times with same shot
+    private SoundFXManager sfxManager; // SoundFXManager component
 
     // Start is called before the first frame update
     void Start()
@@ -30,6 +31,8 @@ public class HealthSystem : MonoBehaviour
             aiPawn = GetComponent<AIPawn>();
             isPlayer = false; // This is not the player
         }
+
+        sfxManager = GetComponent<SoundFXManager>(); // Set SFXManager
     }
 
     // Method that deals damage to the object
@@ -126,5 +129,10 @@ public class HealthSystem : MonoBehaviour
             // Update the HUD according to the currentHealthPercentage (Percentage is required for the health bar)
             GameManager.instance.playerHUD.UpdateHealth(bp.GetCurrentHealthPercentage());
         }
+    }
+    // Used when OnDeath.Invoke is called
+    public void PlayDeathSoundFX()
+    {
+        sfxManager.PlayFXClipAtPoint(SoundFXManager.SelectedFX.maleDeath); // play the male death sound effect
     }
 }

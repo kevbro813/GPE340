@@ -10,9 +10,13 @@ public class ProjectileWeapon : Weapon
     public float rateOfFire; // Indicates the rate of fire of the weapon
     public float lastShotFired; // Variable that stores the last time the cannon was fired
     public bool roundChambered = true; // Bool is true when the timer expires, allowing the cannon can be fired again
+    private SoundFXManager sfxManager; // SoundFXManager component
+    private ParticleSystem muzzleFlash; // ParticleSystem for muzzle flash
     private void Start()
     {
         lastShotFired = Time.time; // Set the lastShotFired to Time.time (used for rate of fire timer)
+        sfxManager = GetComponent<SoundFXManager>(); // Set the SoundFXManager on start
+        muzzleFlash = GetComponentInChildren<ParticleSystem>(); // Set the muzzleflash particle system on start
     }
     // Getter method for recoil
     public float GetRecoil()
@@ -31,6 +35,8 @@ public class ProjectileWeapon : Weapon
         if (Time.time >= lastShotFired + rateOfFire) // Check if the weapon is ready to fire based on Time elapsed since the last shot was fired
         {
             roundChambered = true; // Indicate the weapon is ready to fire
+            sfxManager.PlayDefaultFXClip(); // Play the default sound effect (used when only one sound effect is used)
+            muzzleFlash.Emit(1); // Emit muzzle flash
         }
     }
 

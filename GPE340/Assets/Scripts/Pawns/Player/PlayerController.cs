@@ -46,7 +46,7 @@ public class PlayerController : Base_Controller
             moveDirection = Vector3.ClampMagnitude(moveDirection, GameManager.instance.maxSpeed);
 
             // Toggles world and self space (If true, the controls will be in world space, false is self)
-            if (GameManager.instance.isMovementWorldSpace)
+            if (GameManager.instance.settings.isMovementWorldSpace)
             {
                 moveDirection = tf.InverseTransformDirection(moveDirection); // InverseTransformDirection method converts the moveDirection Vector3 from self to world space
             }
@@ -72,7 +72,7 @@ public class PlayerController : Base_Controller
                 playerPawn.Run(false); // Deactivate run
             }
             // If the camera is not controlled by the mouse, but the player is controlled by the mouse...
-            if (!GameManager.instance.isCameraMouseControlled && GameManager.instance.isPlayerMouseControlled)
+            if (!GameManager.instance.settings.isCameraMouseControlled && GameManager.instance.settings.isPlayerMouseControlled)
             {
                 playerPawn.FaceMouseDir(); // Face the player in the direction of the mouse
             }

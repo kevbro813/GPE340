@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 
+#if UNITY_EDITOR
 [CustomPropertyDrawer(typeof(ItemDrops))] // Create a custom property drawer for the ItemDrops class
 public class ItemDropDrawer : PropertyDrawer // ItemDropDrawer derives from PropertyDrawer
 {
@@ -24,3 +25,4 @@ public class ItemDropDrawer : PropertyDrawer // ItemDropDrawer derives from Prop
         EditorGUI.EndProperty(); // End the override logic for the property
     }
 }
+#endif

@@ -1,18 +1,15 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Audio;
 
+[System.Serializable]
 // GameManager script is a singleton
 public class GameManager : MonoBehaviour
 {
     [HideInInspector] public static GameManager instance; // Static instance of the GameManager for Singleton Pattern
     [Header ("Camera Settings")]
     public Camera mainCam; // Main camera component
-    public bool isCursorLocked = true; // Is cursor locked and invisible
-    public bool isCameraMouseControlled = false; // Bool to indicate if the camera is being controlled by the mouse, false means the camera will trail the player
-    public bool isPlayerMouseControlled = true; // Bool to indicate if the player is controlled by the mouse, false means the player is not controlled by the mouse, but does not mean the mouse controls the camera
-    public bool isMovementWorldSpace = true; // Toggles world and self space with regards to player controls
     public bool isMoveTowards = true; // Toggles between MoveTowards() method and Mathf.Lerp for the camera while trailing the player
     public float maxSpeed = 5; // Max movement speed
     public float rotationSpeed = 100; // Rotation speed
@@ -22,7 +19,6 @@ public class GameManager : MonoBehaviour
     public float camZoomSpeed = 4.0f; // The speed that the camera zooms in and out while in mouse control mode
     public float minZoomDistance = 1.5f; // Lower bound clamp for the zoom distance to prevent clipping inside pawn
     public float maxZoomDistance = 10.0f; // Upper bound clamp for the zoom distance to prevent camera from spinning uncontrollably
-
 
     [Header("Player Settings")]
     public List<GameObject> activePlayers; // List of currently active players
@@ -74,14 +70,22 @@ public class GameManager : MonoBehaviour
 
     [Header("Other Settings")]
     public GameState gameState; // Tracks the current game state using an enum
-    public enum GameState { Pregame, Active, Postgame, Pause, PrePause, Resume, Quit } // Enum for game state
-
+    public enum GameState { Pregame, Active, Postgame, Pause, PrePause, Resume, Quit, Load } // Enum for game state
     public bool isPaused; // Bool to indicate if the game is paused
     public int playerLives; // Tracks the number of lives the player has
     public List<Sprite> weaponIconsList; // List of weapon icons
     public Sprite currentWeaponIcon; // Current weapon icon based on the currently equipped weapon
     public WeaponIcon weaponIcon; // Enum for weapon icons
     public enum WeaponIcon { Pistol, Rifle, Shotgun, None };
+
+    public Settings settings; // Class containing the game settings
+
+    [Header("Audio Settings")]
+    public AudioMixer audioMixer; // AudioMixer
+    public AudioSource musicSource; // Source for the background music
+    public SoundFX soundFX; // SoundFX array that holds all sound effects files
+    public GameObject footstepsSound_Prefab; // Prefab used for footsteps sounds (Needed to use effects output)
+    public GameObject ricochetSound_Prefab; // Prefab used for ricochet sounds (Needed to use effects output)
 
     private void Awake()
     {
@@ -102,6 +106,9 @@ public class GameManager : MonoBehaviour
         playerHUD = hudObject.GetComponent<PlayerHUD>(); // Set the playerHUD component
         menuComponent = pauseMenu.GetComponentInParent<Menus>(); // Get the UI menu component attached to the parent // TODO: MIGHT NOT NEED THIS
         mainCam = Camera.main; // Set the mainCam variable to the main camera
+
+        musicSource = GameObject.FindWithTag("MusicSource").GetComponent<AudioSource>(); // Get Music source gameobject
+        LoadPlayerSettings(); // Load player settings
     }
     private void Start()
     {
@@ -110,6 +117,8 @@ public class GameManager : MonoBehaviour
         hudObject.SetActive(false); // Deactivate the HUD at the beginning of the game
         pauseMenu.SetActive(false); // Deactivate the Pause menu at the beginning of the game
         playerLives = 3; // Set player lives to 3
+
+        SetVolumeOnStart(); // Set volume settings
     }
     // TODO: Complete Main Game FSM
     private void Update()
@@ -154,6 +163,12 @@ public class GameManager : MonoBehaviour
             DoPrePause(); // Run prepause state
             SetGameState(GameState.Pause); // Transition directly to pause state
         }
+
+        if (gameState == GameState.Load) // Load State
+        {
+            DoLoad(); // Run load state
+            SetGameState(GameState.Active); // Immediately transition to Active state
+        }
     }
 
     // Initialize a new game
@@ -178,14 +193,23 @@ public class GameManager : MonoBehaviour
         InstantiateWeapons();
 
         // Set the game to active state
-        SetGameState(GameState.Active);
+        SetGameState(GameState.Load);
+    }
+
+    private void DoLoad() // DoLoad runs after pregame and before active states, allows for music to start when game is active
+    {
+        Debug.Log("Loading");
+        musicSource.Play(); // Begin music when game is started
     }
     private void DoPrePause() // PrePause runs before game enters pause since the following code should only run once
     {
         Debug.Log("PrePause");
         pauseMenu.SetActive(true); // Activate the pause menu
-        menuComponent.UpdateToggles(); // Update the toggle options in the pause menu
-        LockCursor(false); // Set the cursor mode to not locked
+        menuComponent.UpdateSettingsDisplay(); // Update the toggle options in the pause menu
+        menuComponent.applyButton.interactable = false;
+        musicSource.Pause(); // Pause music when game is paused
+        SetCursorVisibility(true); // Set the cursor mode to not locked
+        Cursor.lockState = CursorLockMode.None; // Unlock cursor when paused
         Time.timeScale = 0f; // Pause time
     }
     private void DoPregame() // Run pregame state
@@ -196,14 +220,15 @@ public class GameManager : MonoBehaviour
     private void DoActive() // Run the active state
     {
         Debug.Log("Active");
-        LockCursor(true); // Set cursor mode to locked
+        SetCursorVisibility(settings.isCursorVisible); // Set cursor mode to locked
     }
     private void DoPostgame() // Run post game state
     {
         Debug.Log("Postgame");
-        LockCursor(false); // Set cursor to not locked
+        SetCursorVisibility(true); // Set cursor to not locked
         SetGameState(GameState.Pregame); // Enter pregame state
         Time.timeScale = 1f; // Unpause time
+        musicSource.Stop(); // Stop music when game is over
         UnityEngine.SceneManagement.SceneManager.LoadScene(1); // Load end game scene
     }
     private void DoPause() // State when game is currently paused
@@ -216,7 +241,8 @@ public class GameManager : MonoBehaviour
         Debug.Log("Resume");
         // Unpauses the game
         pauseMenu.SetActive(false); // Deactivate the pause menu
-        LockCursor(true); // Set the cursor mode to locked
+        SetCursorVisibility(settings.isCursorVisible); // Set the cursor mode to locked
+        musicSource.Play(); // Play music when game is resumed
         Time.timeScale = 1f; // Activate time
     }
 
@@ -336,19 +362,30 @@ public class GameManager : MonoBehaviour
     }
 
     // Lock or unlock the cursor, allows use of menus while paused
-    public void LockCursor(bool isLocked)
+    public void SetCursorVisibility(bool isVisible)
     {
-        isCursorLocked = isLocked; // Set isCursorLocked
+        settings.isCursorVisible = isVisible; // Set isCursorLocked
 
-        if (isCursorLocked) // If the cursor is locked
+        if (settings.isCursorVisible) // If the cursor is locked
         {
-            Cursor.lockState = CursorLockMode.Locked; // Lock the cursor (It will stay centered)
-            Cursor.visible = false; // Makes the cursor invisible
+            Cursor.visible = true; // Makes the cursor invisible
         }
         else // If the cursor is not locked
         {
-            Cursor.lockState = CursorLockMode.None; // Unlocks the cursor, allowing it to be moved anywhere
-            Cursor.visible = true; // Makes the cursor visible
+            Cursor.visible = false; // Makes the cursor visible
         }
+    }
+    // Load player Settings 
+    public void LoadPlayerSettings()
+    {
+        SaveLoad.LoadSettings("PlayerSettings"); // Call the LoadSettings method to load player settings
+    }
+    // Method will set the volume settings to the saved settings on start
+    public void SetVolumeOnStart()
+    {
+        // Set the audioMixer volume values
+        audioMixer.SetFloat("masterVolumeParam", settings.masterVolume);
+        audioMixer.SetFloat("musicVolumeParam", settings.musicVolume);
+        audioMixer.SetFloat("effectsVolumeParam", settings.effectsVolume);
     }
 }

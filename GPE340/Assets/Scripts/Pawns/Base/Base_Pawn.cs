@@ -256,4 +256,11 @@ public abstract class Base_Pawn : MonoBehaviour
         GetComponent<Rigidbody>().isKinematic = false; // Set the main rigidbody to not kinematic
         anim.enabled = true; // Enable animations
     }
+    // Play footstep sound effects
+    public void Footsteps()
+    {
+        GameObject footsteps = Instantiate(GameManager.instance.footstepsSound_Prefab, tf.position, tf.rotation) as GameObject; // Instantiate prefab for footsteps (Needed to use effects output)
+        footsteps.GetComponent<SoundFXManager>().PlayFXClipAtPoint(SoundFXManager.SelectedFX.footsteps); // Play footsteps at point to prevent footsteps overlapping each other
+        Destroy(footsteps); // Destroy footsteps gameobject
+    }
 }
